@@ -1,0 +1,24 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Django
+db.sqlite3
+staticfiles/
+
+# Segredos e configuração local
+.env
+
+# Next.js (frontend, passo 9)
+node_modules/
+.next/
+
+# Editor / sistema
+.vscode/
+.DS_Store
+
+# Arquivos de trabalho com o Claude (não vão para o repositório)
+CLAUDE.md
+PLANO.md
+.claude/
