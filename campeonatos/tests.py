@@ -1,5 +1,6 @@
 from datetime import date, datetime, timezone
 
+from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
 from .models import Campeonato, Partida, Time
@@ -7,8 +8,29 @@ from .models import Campeonato, Partida, Time
 HORA = datetime(2026, 12, 2, 15, tzinfo=timezone.utc)
 
 
+class AuthTests(APITestCase):
+    def setUp(self):
+        User.objects.create_user("ana", password="senha123")
+
+    def test_leitura_publica_escrita_protegida(self):
+        self.assertEqual(self.client.get("/api/campeonatos/").status_code, 200)
+        self.assertEqual(self.client.post("/api/campeonatos/", {}, format="json").status_code, 401)
+
+    def test_login_e_uso_do_token(self):
+        r = self.client.post("/api/auth/token/", {"username": "ana", "password": "senha123"}, format="json")
+        self.assertEqual(r.status_code, 200)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {r.json()['access']}")
+        # autenticado, passa da autenticação e cai na validação (400)
+        self.assertEqual(self.client.post("/api/campeonatos/", {}, format="json").status_code, 400)
+
+    def test_login_invalido(self):
+        r = self.client.post("/api/auth/token/", {"username": "ana", "password": "errada"}, format="json")
+        self.assertEqual(r.status_code, 401)
+
+
 class RegrasTests(APITestCase):
     def setUp(self):
+        self.client.force_authenticate(User.objects.create_user("tester", password="x"))
         self.camp = Campeonato.objects.create(
             nome="Copa", modalidade="Futsal", data_inicio=date(2026, 12, 1), data_fim=date(2026, 12, 20), max_times=2
         )

@@ -25,10 +25,13 @@ class Campeonato(models.Model):
 class Time(models.Model):
     nome = models.CharField(max_length=100)
     sigla = models.CharField(max_length=5)
+    cidade = models.CharField(max_length=50, default="Não informada")
+    ano_fundacao = models.PositiveSmallIntegerField(null=True, blank=True)
+    descricao = models.TextField(null=True, blank=True)
     campeonato = models.ForeignKey(
         Campeonato,
         on_delete=models.CASCADE,
-        related_name="times" 
+        related_name="times"
     )
 
     class Meta:

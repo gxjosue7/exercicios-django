@@ -46,6 +46,22 @@ class TimeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("O nome deve ter pelo menos 2 caracteres.")
         return value
 
+    def validate_cidade(self, value):
+        value = value.strip()
+        if not 2 <= len(value) <= 50:
+            raise serializers.ValidationError("A cidade deve ter de 2 a 50 caracteres.")
+        return value
+
+    def validate_ano_fundacao(self, value):
+        if value is not None and not 1850 <= value <= date.today().year:
+            raise serializers.ValidationError(f"O ano de fundação deve estar entre 1850 e {date.today().year}.")
+        return value
+
+    def validate_descricao(self, value):
+        if value is not None and len(value.strip()) > 500:
+            raise serializers.ValidationError("A descrição não pode ultrapassar 500 caracteres.")
+        return value
+
     def validate(self, attrs):
         campeonato = _valor(self, attrs, "campeonato")
         mudou = self.instance is None or campeonato != self.instance.campeonato

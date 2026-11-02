@@ -167,3 +167,13 @@ Paginação: `?page=` e `?page_size=` (padrão 10, máximo 100). Resposta:
 Página além da última retorna `200` com `results` vazio; `page_size` acima de 100 ou `page` menor que 1 retornam `400`.
 
 Exemplo combinado: `/api/partidas/?time=3&status=agendada&ordering=data_hora&page=1&page_size=5`
+
+---
+
+## Passo 7: autenticação JWT (requisito opcional 9)
+
+- `GET` é público; `POST`, `PUT`, `PATCH` e `DELETE` exigem login (sem token: `401`).
+- Login: `POST /api/auth/token/` com `{"username": "...", "password": "..."}` retorna `access` e `refresh`.
+- Renovar: `POST /api/auth/token/refresh/` com `{"refresh": "..."}`.
+- Usar: cabeçalho `Authorization: Bearer <access>`. No Swagger (`/api/docs/`), botão **Authorize**.
+- Usuário de teste (somente desenvolvimento): `teste` / `teste123`.
