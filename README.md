@@ -250,3 +250,21 @@ Exemplos: `/api/times/?cidade=Araquari`, `/api/times/?search=futsal&ordering=-an
 ## Passo 9: classificação
 
 `GET /api/campeonatos/{id}/classificacao/` devolve a tabela do campeonato (vitória 3 pontos, empate 1), considerando só partidas finalizadas. Cada linha traz `posicao`, `time`, `nome`, `jogos`, `vitorias`, `empates`, `derrotas`, `gols_pro`, `gols_contra`, `saldo` e `pontos`. Desempate: pontos, saldo de gols, gols pró e nome. Times sem jogos aparecem com zeros.
+
+---
+
+## Passo 10: frontend, etapa F1 (Next.js)
+
+Pasta `frontend/` (Next.js 16, TypeScript, Tailwind). O backend ganhou `django-cors-headers`; a origem do front é definida em `CORS_ALLOWED_ORIGINS` (padrão `http://localhost:3000`).
+
+Entregue nesta etapa: layout e navegação, login/logout com JWT (renovação automática do token), e **campeonatos completo**: lista com busca, filtro por status, ordenação e paginação; criar, editar (`PUT`) e excluir; erros da API exibidos junto dos campos.
+
+Rodar (com a API em `localhost:8000`):
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:3000
+```
+
+A URL da API vem de `NEXT_PUBLIC_API_URL` (padrão `http://localhost:8000/api`).
