@@ -60,6 +60,32 @@ class RegrasTests(APITestCase):
     def test_partida_agendada_nao_aceita_placar(self):
         self.assertEqual(self.partida(gols_mandante=1, gols_visitante=0).status_code, 400)
 
+    def test_paginacao_busca_ordenacao_filtro(self):
+        for i in range(12):
+            Campeonato.objects.create(
+                nome=f"Liga {i:02d}", modalidade="Futsal" if i % 2 else "Volei",
+                data_inicio=date(2026, 12, 1), data_fim=date(2026, 12, 2), max_times=4,
+            )
+        # 13 campeonatos no total (1 do setUp)
+        r = self.client.get("/api/campeonatos/").json()
+        self.assertEqual((r["page"], r["page_size"], r["total_pages"], len(r["results"])), (1, 10, 2, 10))
+        r = self.client.get("/api/campeonatos/?page=2&page_size=5").json()
+        self.assertEqual((r["total_pages"], len(r["results"])), (3, 5))
+        self.assertEqual(self.client.get("/api/campeonatos/?page=99").json()["results"], [])
+        self.assertEqual(self.client.get("/api/campeonatos/?page_size=101").status_code, 400)
+        self.assertEqual(self.client.get("/api/campeonatos/?page=0").status_code, 400)
+        r = self.client.get("/api/campeonatos/?search=liga 11&ordering=-nome").json()
+        self.assertEqual([c["nome"] for c in r["results"]], ["Liga 11"])
+        r = self.client.get("/api/campeonatos/?modalidade=Volei&ordering=nome&page_size=100").json()
+        self.assertEqual(len(r["results"]), 6)
+        self.assertEqual(r["results"][0]["nome"], "Liga 00")
+
+    def test_filtro_partida_por_time(self):
+        self.partida()
+        self.assertEqual(len(self.client.get(f"/api/partidas/?time={self.a.id}").json()["results"]), 1)
+        self.assertEqual(len(self.client.get("/api/partidas/?status=finalizada").json()["results"]), 0)
+        self.assertEqual(len(self.client.get("/api/partidas/?search=B").json()["results"]), 1)
+
     def test_docs(self):
         self.assertEqual(self.client.get("/api/docs/").status_code, 200)
         self.assertEqual(self.client.get("/api/schema/").status_code, 200)

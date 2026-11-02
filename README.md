@@ -144,3 +144,26 @@ Códigos: `200` leitura/atualização, `201` criação, `204` exclusão, `400` d
 5. `POST /api/partidas/{id}/registrar-placar/` com `{"gols_mandante": 2, "gols_visitante": 1}` finaliza a partida (`200`); se já finalizada, retorna `409`.
 
 Testes automatizados: `uv run python manage.py test`.
+
+---
+
+## Passo 6: filtro, busca, ordenação e paginação
+
+Valem para todas as listas (`GET /api/campeonatos/`, `/times/`, `/jogadores/`, `/partidas/`).
+
+| Recurso | Filtros | Busca (`?search=`) | Ordenação (`?ordering=`, use `-` para decrescente) |
+|---|---|---|---|
+| campeonatos | `status`, `modalidade` | nome, modalidade | nome, data_inicio, data_fim, max_times |
+| times | `campeonato` | nome, sigla | nome, sigla |
+| jogadores | `time`, `time__campeonato`, `posicao` | nome, posicao | nome, numero_camisa |
+| partidas | `campeonato`, `status`, `time` (mandante ou visitante), `data_de`, `data_ate` | nome dos times | data_hora, status |
+
+Paginação: `?page=` e `?page_size=` (padrão 10, máximo 100). Resposta:
+
+```json
+{ "page": 1, "page_size": 10, "total_pages": 2, "results": [] }
+```
+
+Página além da última retorna `200` com `results` vazio; `page_size` acima de 100 ou `page` menor que 1 retornam `400`.
+
+Exemplo combinado: `/api/partidas/?time=3&status=agendada&ordering=data_hora&page=1&page_size=5`

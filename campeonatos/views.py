@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from .filters import PartidaFilter
 from .models import Campeonato, Jogador, Partida, Time
 from .serializers import (
     CampeonatoSerializer,
@@ -17,21 +18,33 @@ from .serializers import (
 class CampeonatoViewSet(ModelViewSet):
     queryset = Campeonato.objects.all().order_by("id")
     serializer_class = CampeonatoSerializer
+    filterset_fields = ("status", "modalidade")
+    search_fields = ("nome", "modalidade")
+    ordering_fields = ("nome", "data_inicio", "data_fim", "max_times")
 
 
 class TimeViewSet(ModelViewSet):
     queryset = Time.objects.all().order_by("id")
     serializer_class = TimeSerializer
+    filterset_fields = ("campeonato",)
+    search_fields = ("nome", "sigla")
+    ordering_fields = ("nome", "sigla")
 
 
 class JogadorViewSet(ModelViewSet):
     queryset = Jogador.objects.all().order_by("id")
     serializer_class = JogadorSerializer
+    filterset_fields = ("time", "time__campeonato", "posicao")
+    search_fields = ("nome", "posicao")
+    ordering_fields = ("nome", "numero_camisa")
 
 
 class PartidaViewSet(ModelViewSet):
     queryset = Partida.objects.all().order_by("id")
     serializer_class = PartidaSerializer
+    filterset_class = PartidaFilter
+    search_fields = ("mandante__nome", "visitante__nome")
+    ordering_fields = ("data_hora", "status")
 
     @extend_schema(request=PlacarSerializer, responses=PartidaSerializer)
     @action(detail=True, methods=["post"], url_path="registrar-placar")
