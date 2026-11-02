@@ -108,6 +108,23 @@ class RegrasTests(APITestCase):
         self.assertEqual(len(self.client.get("/api/partidas/?status=finalizada").json()["results"]), 0)
         self.assertEqual(len(self.client.get("/api/partidas/?search=B").json()["results"]), 1)
 
+    def test_time_novos_campos(self):
+        def novo(**kw):
+            dados = {"nome": "Novo", "sigla": "N", "campeonato": self.camp.id, "cidade": "Araquari", **kw}
+            return self.client.post("/api/times/", dados, format="json")
+
+        self.camp.max_times = 10
+        self.camp.save()
+        self.assertEqual(novo(cidade="A").status_code, 400)
+        self.assertEqual(novo(ano_fundacao=1800).status_code, 400)
+        self.assertEqual(novo(ano_fundacao=2999).status_code, 400)
+        self.assertEqual(novo(descricao="x" * 501).status_code, 400)
+        r = novo(ano_fundacao=1990, descricao="Time de USB-C")
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(self.client.get("/api/times/?cidade=Araquari").json()["results"][0]["id"], r.json()["id"])
+        self.assertEqual(len(self.client.get("/api/times/?search=usb-c").json()["results"]), 1)
+        self.assertEqual(self.client.get("/api/times/?ordering=-ano_fundacao").status_code, 200)
+
     def test_docs(self):
         self.assertEqual(self.client.get("/api/docs/").status_code, 200)
         self.assertEqual(self.client.get("/api/schema/").status_code, 200)

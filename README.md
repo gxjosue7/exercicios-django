@@ -177,3 +177,19 @@ Exemplo combinado: `/api/partidas/?time=3&status=agendada&ordering=data_hora&pag
 - Renovar: `POST /api/auth/token/refresh/` com `{"refresh": "..."}`.
 - Usar: cabeçalho `Authorization: Bearer <access>`. No Swagger (`/api/docs/`), botão **Authorize**.
 - Usuário de teste (somente desenvolvimento): `teste` / `teste123`.
+
+---
+
+## Passo 8: evoluindo o Time (exercício da Aula 26)
+
+Três campos novos em `Time`, atravessando model, migration, serializer, validação, filtro, ordenação, busca e Swagger:
+
+| Campo | Regra | Filtro | Ordenação | Busca |
+|---|---|---|---|---|
+| `cidade` | obrigatório, 2 a 50 caracteres | exato | sim | sim |
+| `ano_fundacao` | opcional, entre 1850 e o ano atual | exato | sim | não (numérico) |
+| `descricao` | opcional, máximo 500 caracteres | não | não | sim |
+
+Migration `0002_time_ano_fundacao_time_cidade_time_descricao`. Times já existentes ficam com cidade `"Não informada"`.
+
+Exemplos: `/api/times/?cidade=Araquari`, `/api/times/?search=futsal&ordering=-ano_fundacao`.

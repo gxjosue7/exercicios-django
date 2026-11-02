@@ -26,9 +26,9 @@ class CampeonatoViewSet(ModelViewSet):
 class TimeViewSet(ModelViewSet):
     queryset = Time.objects.all().order_by("id")
     serializer_class = TimeSerializer
-    filterset_fields = ("campeonato",)
-    search_fields = ("nome", "sigla")
-    ordering_fields = ("nome", "sigla")
+    filterset_fields = ("campeonato", "cidade", "ano_fundacao")
+    search_fields = ("nome", "sigla", "cidade", "descricao")
+    ordering_fields = ("nome", "sigla", "cidade", "ano_fundacao")
 
 
 class JogadorViewSet(ModelViewSet):
