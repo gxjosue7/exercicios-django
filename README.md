@@ -95,3 +95,14 @@ uv run python manage.py migrate
 ```
 
 Gera `campeonatos/migrations/0001_initial.py` e cria as tabelas no `db.sqlite3`.
+
+---
+
+## Passo 3: Django Admin
+
+Os 4 models foram registrados em `campeonatos/admin.py`, com colunas, filtros e busca.
+
+Painel: http://127.0.0.1:8000/admin/ (rode `uv run python manage.py runserver`).
+
+Superusuário de desenvolvimento (só no `db.sqlite3` local, que não vai para o Git):
+`admin` / `admin123`. Para criar o seu: `uv run python manage.py createsuperuser`.
