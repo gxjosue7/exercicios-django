@@ -75,3 +75,23 @@ será resolvido no passo 2.
 | `campeonatos/admin.py` | Registro dos models no painel de administração (passo 3) |
 | `pyproject.toml` / `uv.lock` | Dependências do projeto e suas versões exatas |
 | `.gitignore` | O que o Git não deve versionar (`.venv`, `.env`, banco local) |
+
+---
+
+## Passo 2: models e migrations
+
+Models em `campeonatos/models.py`:
+
+| Model | Campos principais |
+|---|---|
+| `Campeonato` | `nome`, `modalidade`, `data_inicio`, `data_fim`, `max_times`, `status` |
+| `Time` | `nome`, `sigla`, `campeonato` (FK); nome único por campeonato |
+| `Jogador` | `nome`, `numero_camisa`, `posicao`, `time` (FK); camisa única por time |
+| `Partida` | `campeonato`, `mandante`, `visitante` (FKs), `data_hora`, `status`, `gols_mandante`, `gols_visitante` |
+
+```bash
+uv run python manage.py makemigrations
+uv run python manage.py migrate
+```
+
+Gera `campeonatos/migrations/0001_initial.py` e cria as tabelas no `db.sqlite3`.
