@@ -127,3 +127,20 @@ Em cada recurso: `GET` (lista), `POST`, `GET` (item), `PUT`, `PATCH`, `DELETE`.
 
 Códigos: `200` leitura/atualização, `201` criação, `204` exclusão, `400` dado inválido
 (inclui nome de time repetido no campeonato), `404` não encontrado.
+
+---
+
+## Passo 5: Swagger, validações e regras de negócio
+
+- Documentação: `drf-spectacular`. Swagger em `/api/docs/`, Redoc em `/api/redoc/`, schema em `/api/schema/`.
+- Validações nos serializers (resposta `400`): nome com no mínimo 2 caracteres, `max_times` >= 2, `data_fim` >= `data_inicio`, camisa entre 1 e 99.
+
+**Regras de negócio**
+
+1. Só é possível cadastrar time se o campeonato estiver em `inscricoes` e ainda houver vaga (`max_times`).
+2. Partida: mandante diferente de visitante, e os dois times pertencem ao campeonato da partida.
+3. Um time não pode ter duas partidas no mesmo horário.
+4. Partida agendada não tem placar; finalizada exige placar completo e não aceita novo placar.
+5. `POST /api/partidas/{id}/registrar-placar/` com `{"gols_mandante": 2, "gols_visitante": 1}` finaliza a partida (`200`); se já finalizada, retorna `409`.
+
+Testes automatizados: `uv run python manage.py test`.
