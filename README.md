@@ -106,3 +106,24 @@ Painel: http://127.0.0.1:8000/admin/ (rode `uv run python manage.py runserver`).
 
 Superusuário de desenvolvimento (só no `db.sqlite3` local, que não vai para o Git):
 `admin` / `admin123`. Para criar o seu: `uv run python manage.py createsuperuser`.
+
+---
+
+## Passo 4: API REST com Django REST Framework
+
+- `rest_framework` adicionado a `INSTALLED_APPS`.
+- `campeonatos/serializers.py`: um `ModelSerializer` por model (converte objeto em JSON e valida a entrada).
+- `campeonatos/views.py`: uma `ModelViewSet` por model (lista, detalhe, criação, `PUT`, `PATCH` e `DELETE`).
+- `config/urls.py`: `DefaultRouter` gera as rotas abaixo.
+
+| Recurso | Rotas |
+|---|---|
+| Campeonatos | `/api/campeonatos/` e `/api/campeonatos/{id}/` |
+| Times | `/api/times/` e `/api/times/{id}/` |
+| Jogadores | `/api/jogadores/` e `/api/jogadores/{id}/` |
+| Partidas | `/api/partidas/` e `/api/partidas/{id}/` |
+
+Em cada recurso: `GET` (lista), `POST`, `GET` (item), `PUT`, `PATCH`, `DELETE`.
+
+Códigos: `200` leitura/atualização, `201` criação, `204` exclusão, `400` dado inválido
+(inclui nome de time repetido no campeonato), `404` não encontrado.
