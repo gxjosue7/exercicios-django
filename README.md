@@ -268,3 +268,12 @@ npm run dev        # http://localhost:3000
 ```
 
 A URL da API vem de `NEXT_PUBLIC_API_URL` (padrão `http://localhost:8000/api`).
+
+---
+
+## Passo 11: frontend, etapa F2 (Times e Jogadores)
+
+- Telas de **Times** (`/times`) e **Jogadores** (`/jogadores`): lista com busca, filtro (por campeonato ou por time), ordenação e paginação; criar, editar (`PUT`) e excluir.
+- Os formulários trazem selects de campeonato/time carregados da API e os campos novos do time (`cidade`, `ano_fundacao`, `descricao`). Erros de validação e de regra de negócio (vaga, inscrições encerradas, camisa repetida) aparecem junto do campo.
+- O código das listas e formulários foi extraído em peças reutilizáveis (`useLista`, `useFormulario`, `Resultados`, `Campo`), e os campeonatos passaram a usá-las.
+- API: `LANGUAGE_CODE = "pt-br"`, então as mensagens padrão de erro do DRF saem em português.

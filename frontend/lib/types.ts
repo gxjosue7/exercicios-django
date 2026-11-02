@@ -16,6 +16,24 @@ export type Campeonato = {
   status: StatusCampeonato;
 };
 
+export type Time = {
+  id: number;
+  nome: string;
+  sigla: string;
+  cidade: string;
+  ano_fundacao: number | null;
+  descricao: string | null;
+  campeonato: number;
+};
+
+export type Jogador = {
+  id: number;
+  nome: string;
+  numero_camisa: number;
+  posicao: string;
+  time: number;
+};
+
 export type Paginado<T> = {
   page: number;
   page_size: number;
