@@ -4,8 +4,59 @@ Projeto final de Desenvolvimento Web II (BSI, IFC Araquari): uma API REST para
 gerenciar campeonatos, times, jogadores e partidas, feita com Django + Django REST
 Framework.
 
-> Este README é construído passo a passo. Cada passo abaixo explica o que foi feito
-> e por quê.
+## Domínio
+
+Gerenciador de campeonatos esportivos.
+
+| Entidade | Descrição |
+|---|---|
+| `Campeonato` | competição, com modalidade, datas, limite de times e status (`inscricoes`, `andamento`, `encerrado`) |
+| `Time` | pertence a um campeonato; nome único por campeonato |
+| `Jogador` | pertence a um time; camisa única por time |
+| `Partida` | jogo entre dois times (mandante e visitante) do mesmo campeonato |
+
+**Regras de negócio:** só entram times com inscrições abertas e vaga; mandante e visitante diferentes e do mesmo campeonato; um time não joga duas partidas no mesmo horário; partida agendada não tem placar e finalizada não aceita novo placar (`POST /api/partidas/{id}/registrar-placar/`).
+
+## Instalação e execução
+
+Requisitos: Python 3.14+ e [uv](https://docs.astral.sh/uv/).
+
+```bash
+uv sync
+uv run python manage.py migrate
+uv run python manage.py createsuperuser   # usuário do Admin e da API
+uv run python manage.py runserver
+```
+
+- API: http://127.0.0.1:8000/api/
+- Swagger: http://127.0.0.1:8000/api/docs/ (Redoc em `/api/redoc/`)
+- Admin: http://127.0.0.1:8000/admin/
+- Testes: `uv run python manage.py test`
+
+Banco: SQLite (`db.sqlite3`, criado pelo `migrate`; não vai para o Git).
+
+Variáveis de ambiente (opcionais em desenvolvimento): `SECRET_KEY`, `DEBUG` (`1` ou `0`) e `ALLOWED_HOSTS` (separados por vírgula). Não há segredos no repositório.
+
+## API
+
+| Recurso | Rotas |
+|---|---|
+| Campeonatos | `/api/campeonatos/`, `/api/campeonatos/{id}/` |
+| Times | `/api/times/`, `/api/times/{id}/` |
+| Jogadores | `/api/jogadores/`, `/api/jogadores/{id}/` |
+| Partidas | `/api/partidas/`, `/api/partidas/{id}/`, `POST /api/partidas/{id}/registrar-placar/` |
+
+Em cada recurso: `GET` lista, `POST`, `GET` item, `PUT`, `PATCH`, `DELETE`. Corpos e respostas de cada operação estão no Swagger. Códigos: `200`, `201`, `204`, `400` (validação), `401` (sem login), `404`, `409` (placar já registrado).
+
+Filtros, busca, ordenação e paginação: ver o **Passo 6** abaixo.
+
+**Autenticação (JWT):** `GET` é público; as demais operações exigem `Authorization: Bearer <access>`. Obtenha o token em `POST /api/auth/token/` com `{"username", "password"}`. Usuário de teste local: veja o **Passo 7**; em outro ambiente, crie um com `createsuperuser`.
+
+---
+
+# Histórico dos passos
+
+Registro do desenvolvimento, na ordem em que foi feito (seguindo as Aulas 17 a 26 do curso).
 
 ---
 
