@@ -41,7 +41,7 @@ Variáveis de ambiente (opcionais em desenvolvimento): `SECRET_KEY`, `DEBUG` (`1
 
 | Recurso | Rotas |
 |---|---|
-| Campeonatos | `/api/campeonatos/`, `/api/campeonatos/{id}/` |
+| Campeonatos | `/api/campeonatos/`, `/api/campeonatos/{id}/`, `GET /api/campeonatos/{id}/classificacao/` |
 | Times | `/api/times/`, `/api/times/{id}/` |
 | Jogadores | `/api/jogadores/`, `/api/jogadores/{id}/` |
 | Partidas | `/api/partidas/`, `/api/partidas/{id}/`, `POST /api/partidas/{id}/registrar-placar/` |
@@ -244,3 +244,9 @@ Três campos novos em `Time`, atravessando model, migration, serializer, valida�
 Migration `0002_time_ano_fundacao_time_cidade_time_descricao`. Times já existentes ficam com cidade `"Não informada"`.
 
 Exemplos: `/api/times/?cidade=Araquari`, `/api/times/?search=futsal&ordering=-ano_fundacao`.
+
+---
+
+## Passo 9: classificação
+
+`GET /api/campeonatos/{id}/classificacao/` devolve a tabela do campeonato (vitória 3 pontos, empate 1), considerando só partidas finalizadas. Cada linha traz `posicao`, `time`, `nome`, `jogos`, `vitorias`, `empates`, `derrotas`, `gols_pro`, `gols_contra`, `saldo` e `pontos`. Desempate: pontos, saldo de gols, gols pró e nome. Times sem jogos aparecem com zeros.

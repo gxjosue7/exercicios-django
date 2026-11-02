@@ -125,6 +125,20 @@ class RegrasTests(APITestCase):
         self.assertEqual(len(self.client.get("/api/times/?search=usb-c").json()["results"]), 1)
         self.assertEqual(self.client.get("/api/times/?ordering=-ano_fundacao").status_code, 200)
 
+    def test_classificacao(self):
+        self.camp.max_times = 3
+        self.camp.save()
+        c = Time.objects.create(nome="C", sigla="C", campeonato=self.camp)
+        p1 = self.partida().json()["id"]  # A x B
+        self.client.post(f"/api/partidas/{p1}/registrar-placar/", {"gols_mandante": 3, "gols_visitante": 1}, format="json")
+        p2 = self.partida(mandante=self.b.id, visitante=c.id, data_hora="2026-12-03T15:00:00Z").json()["id"]
+        self.client.post(f"/api/partidas/{p2}/registrar-placar/", {"gols_mandante": 1, "gols_visitante": 1}, format="json")
+        self.partida(mandante=c.id, visitante=self.a.id, data_hora="2026-12-04T15:00:00Z")  # agendada: não conta
+        tabela = self.client.get(f"/api/campeonatos/{self.camp.id}/classificacao/").json()
+        self.assertEqual([(l["nome"], l["pontos"], l["saldo"], l["jogos"]) for l in tabela],
+                         [("A", 3, 2, 1), ("C", 1, 0, 1), ("B", 1, -2, 2)])
+        self.assertEqual([l["posicao"] for l in tabela], [1, 2, 3])
+
     def test_docs(self):
         self.assertEqual(self.client.get("/api/docs/").status_code, 200)
         self.assertEqual(self.client.get("/api/schema/").status_code, 200)

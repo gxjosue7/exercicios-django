@@ -128,3 +128,17 @@ class PartidaSerializer(serializers.ModelSerializer):
 class PlacarSerializer(serializers.Serializer):
     gols_mandante = serializers.IntegerField(min_value=0)
     gols_visitante = serializers.IntegerField(min_value=0)
+
+
+class ClassificacaoSerializer(serializers.Serializer):
+    posicao = serializers.IntegerField()
+    time = serializers.IntegerField(help_text="id do time")
+    nome = serializers.CharField()
+    jogos = serializers.IntegerField()
+    vitorias = serializers.IntegerField()
+    empates = serializers.IntegerField()
+    derrotas = serializers.IntegerField()
+    gols_pro = serializers.IntegerField()
+    gols_contra = serializers.IntegerField()
+    saldo = serializers.IntegerField()
+    pontos = serializers.IntegerField()
