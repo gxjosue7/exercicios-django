@@ -75,6 +75,7 @@ export function useLista<T>(endpoint: string, ordenacaoInicial: string) {
     page,
     setPage,
     excluir,
+    recarregar: () => setRecarga((n) => n + 1),
   };
 }
 

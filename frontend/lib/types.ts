@@ -34,6 +34,33 @@ export type Jogador = {
   time: number;
 };
 
+export type StatusPartida = "agendada" | "finalizada";
+
+export type Partida = {
+  id: number;
+  campeonato: number;
+  mandante: number;
+  visitante: number;
+  data_hora: string;
+  status: StatusPartida;
+  gols_mandante: number | null;
+  gols_visitante: number | null;
+};
+
+export type LinhaClassificacao = {
+  posicao: number;
+  time: number;
+  nome: string;
+  jogos: number;
+  vitorias: number;
+  empates: number;
+  derrotas: number;
+  gols_pro: number;
+  gols_contra: number;
+  saldo: number;
+  pontos: number;
+};
+
 export type Paginado<T> = {
   page: number;
   page_size: number;

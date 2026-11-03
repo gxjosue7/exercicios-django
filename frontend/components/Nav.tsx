@@ -14,6 +14,7 @@ export default function Nav() {
         </Link>
         <Link href="/times">Times</Link>
         <Link href="/jogadores">Jogadores</Link>
+        <Link href="/partidas">Partidas</Link>
         <div className="ml-auto flex items-center gap-3 text-sm">
           {logado ? (
             <button type="button" className="btn-sec" onClick={limparTokens}>

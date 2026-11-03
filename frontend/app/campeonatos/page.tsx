@@ -54,6 +54,7 @@ export default function CampeonatosPage() {
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs dark:bg-slate-800">
               {STATUS_CAMPEONATO[c.status]}
             </span>
+            <Link href={`/campeonatos/${c.id}/classificacao`} className="btn-sec">Classificação</Link>
             {logado && (
               <AcoesDoItem
                 editar={`/campeonatos/${c.id}/editar`}

@@ -277,3 +277,13 @@ A URL da API vem de `NEXT_PUBLIC_API_URL` (padrão `http://localhost:8000/api`).
 - Os formulários trazem selects de campeonato/time carregados da API e os campos novos do time (`cidade`, `ano_fundacao`, `descricao`). Erros de validação e de regra de negócio (vaga, inscrições encerradas, camisa repetida) aparecem junto do campo.
 - O código das listas e formulários foi extraído em peças reutilizáveis (`useLista`, `useFormulario`, `Resultados`, `Campo`), e os campeonatos passaram a usá-las.
 - API: `LANGUAGE_CODE = "pt-br"`, então as mensagens padrão de erro do DRF saem em português.
+
+---
+
+## Passo 12: frontend, etapa F3 (Partidas e classificação)
+
+- **Partidas** (`/partidas`): lista com busca pelo nome dos times; filtros por campeonato, time (mandante ou visitante), status e período; ordenação e paginação; criar, editar e excluir.
+- No formulário, os times disponíveis dependem do campeonato escolhido. Regras da API (mesmo time dos dois lados, time de outro campeonato, conflito de horário) aparecem na tela.
+- **Registrar placar** direto na lista, em partidas agendadas (`POST /api/partidas/{id}/registrar-placar/`); a partida passa a finalizada e o placar não muda mais.
+- **Classificação** (`/campeonatos/{id}/classificacao`): tabela com pontos, jogos, vitórias, empates, derrotas, gols e saldo, acessível pelo botão em cada campeonato.
+- O horário é exibido como a API devolve (UTC), sem conversão de fuso.
