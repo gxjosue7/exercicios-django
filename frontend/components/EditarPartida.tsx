@@ -13,7 +13,6 @@ export default function EditarPartida({ id }: { id: string }) {
       renderizar={(inicial, salvar) => (
         <PartidaForm
           inicial={inicial}
-          // PUT é completo: status e placar não são editados aqui, vão como estão
           aoEnviar={(dados) =>
             salvar({
               ...dados,

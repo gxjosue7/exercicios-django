@@ -59,6 +59,7 @@ export default function JogadoresPage() {
             </div>
             {logado && (
               <AcoesDoItem
+                nome={j.nome}
                 editar={`/jogadores/${j.id}/editar`}
                 aoExcluir={() => lista.excluir(j.id, `Excluir o jogador "${j.nome}"?`, `"${j.nome}" foi excluído.`)}
               />

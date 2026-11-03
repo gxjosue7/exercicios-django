@@ -37,12 +37,10 @@ export default function TimeForm({
         <select
           id="campeonato"
           name="campeonato"
-          // key força o select a assumir o valor inicial quando as opções terminam de carregar
           key={campeonatos.itens.length}
           defaultValue={inicial?.campeonato ?? ""}
           required
           className="input"
-          aria-describedby="campeonato-erro"
         >
           <option value="">Selecione…</option>
           {campeonatos.itens.map((c) => (
@@ -51,19 +49,19 @@ export default function TimeForm({
         </select>
       </Campo>
       <Campo id="nome" rotulo="Nome" erros={erros.nome}>
-        <input id="nome" name="nome" defaultValue={inicial?.nome} required className="input" aria-describedby="nome-erro" />
+        <input id="nome" name="nome" defaultValue={inicial?.nome} required className="input" />
       </Campo>
       <Campo id="sigla" rotulo="Sigla" erros={erros.sigla}>
-        <input id="sigla" name="sigla" maxLength={5} defaultValue={inicial?.sigla} required className="input" aria-describedby="sigla-erro" />
+        <input id="sigla" name="sigla" maxLength={5} defaultValue={inicial?.sigla} required className="input" />
       </Campo>
       <Campo id="cidade" rotulo="Cidade" erros={erros.cidade}>
-        <input id="cidade" name="cidade" maxLength={50} defaultValue={inicial?.cidade} required className="input" aria-describedby="cidade-erro" />
+        <input id="cidade" name="cidade" maxLength={50} defaultValue={inicial?.cidade} required className="input" />
       </Campo>
       <Campo id="ano_fundacao" rotulo="Ano de fundação (opcional)" erros={erros.ano_fundacao}>
-        <input id="ano_fundacao" name="ano_fundacao" type="number" defaultValue={inicial?.ano_fundacao ?? ""} className="input" aria-describedby="ano_fundacao-erro" />
+        <input id="ano_fundacao" name="ano_fundacao" type="number" defaultValue={inicial?.ano_fundacao ?? ""} className="input" />
       </Campo>
       <Campo id="descricao" rotulo="Descrição (opcional, até 500 caracteres)" erros={erros.descricao} className="sm:col-span-2">
-        <textarea id="descricao" name="descricao" rows={3} defaultValue={inicial?.descricao ?? ""} className="input" aria-describedby="descricao-erro" />
+        <textarea id="descricao" name="descricao" rows={3} defaultValue={inicial?.descricao ?? ""} className="input" />
       </Campo>
       <div className="flex gap-2 sm:col-span-2">
         <button type="submit" className="btn" disabled={enviando}>

@@ -6,7 +6,6 @@ import { apiFetch } from "@/lib/api";
 import { useLogado } from "@/lib/useLogado";
 import { useRegistro } from "@/lib/useRegistro";
 
-/** Página "editar": carrega o registro, exige login, envia `PUT` (atualização completa) e volta para `rota`. */
 export default function Edicao<T>({
   titulo,
   caminho,

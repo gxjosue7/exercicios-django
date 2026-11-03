@@ -24,7 +24,6 @@ class Paginacao(PageNumberPagination):
             raise ValidationError({"page": "Informe um número inteiro positivo."})
 
         self.total_pages = ceil(self.paginator.count / page_size)
-        # página além da última: 200 com lista vazia (mesmo contrato das aulas de Express/FastAPI)
         if self.page_number > self.total_pages:
             return []
         return list(self.paginator.page(self.page_number))

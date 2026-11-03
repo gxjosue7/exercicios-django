@@ -1,4 +1,3 @@
-/** Campo de busca + filtros extras (children) + botão. */
 export default function BarraBusca({
   busca,
   setBusca,

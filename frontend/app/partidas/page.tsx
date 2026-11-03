@@ -75,7 +75,6 @@ export default function PartidasPage() {
             type="date"
             title="Até"
             value={(f.data_ate ?? "").slice(0, 10)}
-            // inclui o dia inteiro: o filtro da API compara com data e hora
             onChange={(e) => lista.setFiltro("data_ate", e.target.value ? `${e.target.value}T23:59:59` : "")}
             className="input"
           />
@@ -108,6 +107,7 @@ export default function PartidasPage() {
             {logado && p.status === "agendada" && <RegistrarPlacar partida={p} aoRegistrar={lista.recarregar} />}
             {logado && (
               <AcoesDoItem
+                nome={`a partida ${times.nome(p.mandante)} x ${times.nome(p.visitante)}`}
                 editar={`/partidas/${p.id}/editar`}
                 aoExcluir={() =>
                   lista.excluir(

@@ -4,7 +4,6 @@ import { apiFetch } from "@/lib/api";
 import type { Partida } from "@/lib/types";
 import { useFormulario } from "@/lib/useFormulario";
 
-/** Formulário em linha que finaliza uma partida agendada (`POST /partidas/{id}/registrar-placar/`). */
 export default function RegistrarPlacar({ partida, aoRegistrar }: { partida: Partida; aoRegistrar: () => void }) {
   const { erros, enviando, enviar } = useFormulario(async (f) => {
     await apiFetch(`/partidas/${partida.id}/registrar-placar/`, {

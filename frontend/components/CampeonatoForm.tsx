@@ -32,19 +32,19 @@ export default function CampeonatoForm({
         <Erros mensagens={erros.geral} />
       </div>
       <Campo id="nome" rotulo="Nome" erros={erros.nome} className="sm:col-span-2">
-        <input id="nome" name="nome" defaultValue={inicial?.nome} required className="input" aria-describedby="nome-erro" />
+        <input id="nome" name="nome" defaultValue={inicial?.nome} required className="input" />
       </Campo>
       <Campo id="modalidade" rotulo="Modalidade" erros={erros.modalidade}>
-        <input id="modalidade" name="modalidade" defaultValue={inicial?.modalidade} required className="input" aria-describedby="modalidade-erro" />
+        <input id="modalidade" name="modalidade" defaultValue={inicial?.modalidade} required className="input" />
       </Campo>
       <Campo id="max_times" rotulo="Máximo de times" erros={erros.max_times}>
-        <input id="max_times" name="max_times" type="number" min={2} defaultValue={inicial?.max_times ?? 8} required className="input" aria-describedby="max_times-erro" />
+        <input id="max_times" name="max_times" type="number" min={2} defaultValue={inicial?.max_times ?? 8} required className="input" />
       </Campo>
       <Campo id="data_inicio" rotulo="Início" erros={erros.data_inicio}>
-        <input id="data_inicio" name="data_inicio" type="date" defaultValue={inicial?.data_inicio} required className="input" aria-describedby="data_inicio-erro" />
+        <input id="data_inicio" name="data_inicio" type="date" defaultValue={inicial?.data_inicio} required className="input" />
       </Campo>
       <Campo id="data_fim" rotulo="Fim" erros={erros.data_fim}>
-        <input id="data_fim" name="data_fim" type="date" defaultValue={inicial?.data_fim} required className="input" aria-describedby="data_fim-erro" />
+        <input id="data_fim" name="data_fim" type="date" defaultValue={inicial?.data_fim} required className="input" />
       </Campo>
       <Campo id="status" rotulo="Status" erros={erros.status}>
         <select id="status" name="status" defaultValue={inicial?.status ?? "inscricoes"} className="input">

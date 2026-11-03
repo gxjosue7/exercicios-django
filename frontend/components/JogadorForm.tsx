@@ -39,7 +39,6 @@ export default function JogadorForm({
           defaultValue={inicial?.time ?? ""}
           required
           className="input"
-          aria-describedby="time-erro"
         >
           <option value="">Selecione…</option>
           {times.itens.map((t) => (
@@ -48,13 +47,13 @@ export default function JogadorForm({
         </select>
       </Campo>
       <Campo id="nome" rotulo="Nome" erros={erros.nome} className="sm:col-span-2">
-        <input id="nome" name="nome" defaultValue={inicial?.nome} required className="input" aria-describedby="nome-erro" />
+        <input id="nome" name="nome" defaultValue={inicial?.nome} required className="input" />
       </Campo>
       <Campo id="numero_camisa" rotulo="Número da camisa (1 a 99)" erros={erros.numero_camisa}>
-        <input id="numero_camisa" name="numero_camisa" type="number" min={1} max={99} defaultValue={inicial?.numero_camisa} required className="input" aria-describedby="numero_camisa-erro" />
+        <input id="numero_camisa" name="numero_camisa" type="number" min={1} max={99} defaultValue={inicial?.numero_camisa} required className="input" />
       </Campo>
       <Campo id="posicao" rotulo="Posição (opcional)" erros={erros.posicao}>
-        <input id="posicao" name="posicao" maxLength={30} defaultValue={inicial?.posicao} className="input" aria-describedby="posicao-erro" />
+        <input id="posicao" name="posicao" maxLength={30} defaultValue={inicial?.posicao} className="input" />
       </Campo>
       <div className="flex gap-2 sm:col-span-2">
         <button type="submit" className="btn" disabled={enviando}>

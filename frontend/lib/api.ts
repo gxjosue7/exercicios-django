@@ -1,6 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 
-// shortcut: tokens em localStorage (legível por XSS), trocar por cookie httpOnly se o app crescer
 const ACCESS = "token_access";
 const REFRESH = "token_refresh";
 
@@ -67,7 +66,6 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   };
 
   let res = await enviar();
-  // token vencido: tenta renovar; se não der, segue sem login (leituras são públicas)
   if (res.status === 401 && localStorage.getItem(ACCESS)) {
     if (!(await renovarToken())) limparTokens();
     res = await enviar();
@@ -86,7 +84,6 @@ export async function login(username: string, password: string) {
   salvarTokens(data.access, data.refresh);
 }
 
-/** Erros do DRF viram { campo: [mensagens] }; o que não é de campo vai em "geral". */
 export function errosDaApi(e: unknown): Record<string, string[]> {
   if (!(e instanceof ApiError)) return { geral: ["Não foi possível conectar à API."] };
   const d = e.data;

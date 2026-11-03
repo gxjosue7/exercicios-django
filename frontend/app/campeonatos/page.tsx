@@ -3,6 +3,7 @@
 import Link from "next/link";
 import BarraBusca, { Seletor } from "@/components/BarraBusca";
 import Resultados, { AcoesDoItem } from "@/components/Resultados";
+import { formatarData } from "@/lib/datas";
 import { type Campeonato, STATUS_CAMPEONATO } from "@/lib/types";
 import { useLista } from "@/lib/useLista";
 import { useLogado } from "@/lib/useLogado";
@@ -16,8 +17,6 @@ const ORDENACOES: [string, string][] = [
 ];
 
 const STATUS: [string, string][] = [["", "Todos os status"], ...Object.entries(STATUS_CAMPEONATO)];
-
-const formatarData = (iso: string) => iso.split("-").reverse().join("/");
 
 export default function CampeonatosPage() {
   const logado = useLogado();
@@ -54,9 +53,12 @@ export default function CampeonatosPage() {
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs dark:bg-slate-800">
               {STATUS_CAMPEONATO[c.status]}
             </span>
-            <Link href={`/campeonatos/${c.id}/classificacao`} className="btn-sec">Classificação</Link>
+            <Link href={`/campeonatos/${c.id}/classificacao`} className="btn-sec" aria-label={`Classificação de ${c.nome}`}>
+              Classificação
+            </Link>
             {logado && (
               <AcoesDoItem
+                nome={c.nome}
                 editar={`/campeonatos/${c.id}/editar`}
                 aoExcluir={() =>
                   lista.excluir(

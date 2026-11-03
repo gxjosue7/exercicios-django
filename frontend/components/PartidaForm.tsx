@@ -20,7 +20,6 @@ export default function PartidaForm({
 }) {
   const [campeonato, setCampeonato] = useState(inicial ? String(inicial.campeonato) : "");
   const campeonatos = useOpcoes<Campeonato>("/campeonatos/");
-  // os times disponíveis são os do campeonato escolhido
   const times = useOpcoes<Time>(campeonato ? `/times/?campeonato=${campeonato}` : null);
   const { erros, enviando, enviar } = useFormulario((f) =>
     aoEnviar({
@@ -41,7 +40,6 @@ export default function PartidaForm({
         required
         disabled={!campeonato}
         className="input"
-        aria-describedby={`${nome}-erro`}
       >
         <option value="">{campeonato ? "Selecione…" : "Escolha o campeonato primeiro"}</option>
         {times.itens.map((t) => (
@@ -64,7 +62,6 @@ export default function PartidaForm({
           onChange={(e) => setCampeonato(e.target.value)}
           required
           className="input"
-          aria-describedby="campeonato-erro"
         >
           <option value="">Selecione…</option>
           {campeonatos.itens.map((c) => (
@@ -82,7 +79,6 @@ export default function PartidaForm({
           defaultValue={inicial ? paraInputDataHora(inicial.data_hora) : ""}
           required
           className="input"
-          aria-describedby="data_hora-erro"
         />
       </Campo>
       <div className="flex gap-2 sm:col-span-2">

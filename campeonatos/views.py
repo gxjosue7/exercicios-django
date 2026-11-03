@@ -23,10 +23,12 @@ class CampeonatoViewSet(ModelViewSet):
     search_fields = ("nome", "modalidade")
     ordering_fields = ("nome", "data_inicio", "data_fim", "max_times")
 
-    @extend_schema(responses=ClassificacaoSerializer(many=True))
+    @extend_schema(
+        description="Tabela do campeonato: vitória 3 pts, empate 1 pt; considera só partidas finalizadas.",
+        responses=ClassificacaoSerializer(many=True),
+    )
     @action(detail=True, methods=["get"])
     def classificacao(self, request, pk=None):
-        """Tabela do campeonato: vitória 3 pts, empate 1 pt; considera só partidas finalizadas."""
         campeonato = self.get_object()
         tabela = {
             t.id: dict(time=t.id, nome=t.nome, jogos=0, vitorias=0, empates=0, derrotas=0,

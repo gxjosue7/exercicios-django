@@ -11,7 +11,6 @@ async function Resolvido({
   return children(id);
 }
 
-/** Lê o `id` da rota (assíncrono no Next 16) dentro de um Suspense. */
 export default function ComId({
   params,
   children,

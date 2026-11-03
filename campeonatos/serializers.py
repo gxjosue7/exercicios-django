@@ -7,7 +7,6 @@ from .models import Campeonato, Jogador, Partida, Time
 
 
 def _valor(serializer, attrs, campo):
-    """Valor enviado ou, em atualização parcial, o que já está salvo."""
     if campo in attrs:
         return attrs[campo]
     return getattr(serializer.instance, campo, None)
@@ -105,7 +104,6 @@ class PartidaSerializer(serializers.ModelSerializer):
         if mandante.campeonato_id != campeonato.id or visitante.campeonato_id != campeonato.id:
             raise serializers.ValidationError("Os dois times devem pertencer ao campeonato da partida.")
 
-        # um time não joga duas partidas ao mesmo tempo
         conflito = Partida.objects.filter(data_hora=data_hora).filter(
             Q(mandante__in=[mandante, visitante]) | Q(visitante__in=[mandante, visitante])
         )
@@ -114,7 +112,6 @@ class PartidaSerializer(serializers.ModelSerializer):
         if conflito.exists():
             raise serializers.ValidationError({"data_hora": "Um dos times já tem partida neste horário."})
 
-        # placar só existe em partida finalizada, e não pode ser trocado depois
         if status == Partida.Status.FINALIZADA and (gm is None or gv is None):
             raise serializers.ValidationError("Partida finalizada precisa do placar completo.")
         if status == Partida.Status.AGENDADA and (gm is not None or gv is not None):

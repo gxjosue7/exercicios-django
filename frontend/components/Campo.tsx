@@ -1,4 +1,5 @@
-/** Rótulo + controle + erros da API do campo. O controle deve ter `id` igual ao informado. */
+import { cloneElement, isValidElement } from "react";
+
 export default function Campo({
   id,
   rotulo,
@@ -10,19 +11,24 @@ export default function Campo({
   rotulo: string;
   erros?: string[];
   className?: string;
-  children: React.ReactNode;
+  children: React.ReactElement<React.HTMLAttributes<HTMLElement>>;
 }) {
+  const temErro = !!erros?.length;
   return (
     <div className={className}>
       <label htmlFor={id} className="mb-1 block text-sm font-medium">
         {rotulo}
       </label>
-      {children}
-      {erros?.map((m) => (
-        <p key={m} id={`${id}-erro`} className="mt-1 text-sm text-red-600">
-          {m}
-        </p>
-      ))}
+      {isValidElement(children) && temErro
+        ? cloneElement(children, { "aria-describedby": `${id}-erro`, "aria-invalid": true })
+        : children}
+      {temErro && (
+        <div id={`${id}-erro`} className="mt-1 text-sm text-red-600">
+          {erros.map((m) => (
+            <p key={m}>{m}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

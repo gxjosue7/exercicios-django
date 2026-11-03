@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend: Campeonatos
 
-## Getting Started
+Interface em Next.js 16 (App Router), TypeScript e Tailwind CSS para a API de campeonatos (ver o README da raiz).
 
-First, run the development server:
+## Rodar
+
+Com a API no ar em `http://localhost:8000`:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra http://localhost:3000. A URL da API vem de `NEXT_PUBLIC_API_URL` (padrão `http://localhost:8000/api`); no backend, a origem do front é liberada por `CORS_ALLOWED_ORIGINS`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Outros comandos: `npm run build` (build de produção), `npm run lint`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Telas
 
-## Learn More
+| Rota | O que faz |
+|---|---|
+| `/campeonatos` | lista com busca, filtro, ordenação e paginação; criar, editar e excluir |
+| `/campeonatos/{id}/classificacao` | tabela de classificação |
+| `/times`, `/jogadores` | lista, criar, editar e excluir |
+| `/partidas` | lista com filtros (campeonato, time, status, período), criar, editar, excluir e registrar placar |
+| `/login` | login com JWT |
 
-To learn more about Next.js, take a look at the following resources:
+Leitura é pública; criar, editar, excluir e registrar placar exigem login.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estrutura
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `app/`: rotas (cada pasta é uma URL); `layout.tsx` define menu, título e link de pular para o conteúdo.
+- `components/`: formulários (`CampeonatoForm`, `TimeForm`, `JogadorForm`, `PartidaForm`), peças compartilhadas (`Resultados`, `BarraBusca`, `Campo`, `Criacao`, `Edicao`) e `Nav`.
+- `lib/api.ts`: chamadas à API, tokens JWT (renovação automática) e tradução dos erros do DRF.
+- `lib/useLista.ts`, `useFormulario.ts`, `useOpcoes.ts`, `useRegistro.ts`: hooks de lista paginada, envio de formulário, opções de selects e carga de um registro.
 
-## Deploy on Vercel
+## Acessibilidade
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Link para pular ao conteúdo, `aria-current` no menu, erros ligados aos campos (`aria-describedby` e `aria-invalid`), botões com nome do item (`aria-label`), título de aba por página e `color-scheme` para tema claro e escuro.

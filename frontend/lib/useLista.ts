@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { apiFetch, mensagemDeErro } from "./api";
 import type { Paginado } from "./types";
 
-/** Estado de uma lista paginada: busca, filtros, ordenação, página e exclusão. */
 export function useLista<T>(endpoint: string, ordenacaoInicial: string) {
   const [busca, setBusca] = useState("");
   const [buscaAplicada, setBuscaAplicada] = useState("");
@@ -22,7 +21,6 @@ export function useLista<T>(endpoint: string, ordenacaoInicial: string) {
   if (buscaAplicada) params.set("search", buscaAplicada);
   for (const [nome, valor] of Object.entries(filtros)) if (valor) params.set(nome, valor);
   const consulta = params.toString();
-  // `chave` identifica a consulta; enquanto o resultado guardado tiver outra chave, está carregando
   const chave = `${endpoint}?${consulta}|${recarga}`;
 
   useEffect(() => {

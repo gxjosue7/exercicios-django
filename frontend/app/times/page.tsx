@@ -61,6 +61,7 @@ export default function TimesPage() {
             </div>
             {logado && (
               <AcoesDoItem
+                nome={t.nome}
                 editar={`/times/${t.id}/editar`}
                 aoExcluir={() =>
                   lista.excluir(t.id, `Excluir o time "${t.nome}"? Os jogadores e partidas dele também serão apagados.`, `"${t.nome}" foi excluído.`)

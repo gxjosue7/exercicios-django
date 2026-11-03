@@ -3,7 +3,6 @@
 import Link from "next/link";
 import type { Lista } from "@/lib/useLista";
 
-/** Aviso, estados de carregando/erro/vazio, itens e paginação de uma `useLista`. */
 export default function Resultados<T extends { id: number }>({
   lista,
   vazio,
@@ -72,16 +71,18 @@ export default function Resultados<T extends { id: number }>({
 }
 
 export function AcoesDoItem({
+  nome,
   editar,
   aoExcluir,
 }: {
+  nome: string;
   editar: string;
   aoExcluir: () => void;
 }) {
   return (
     <div className="flex gap-2">
-      <Link href={editar} className="btn-sec">Editar</Link>
-      <button type="button" className="btn-perigo" onClick={aoExcluir}>Excluir</button>
+      <Link href={editar} className="btn-sec" aria-label={`Editar ${nome}`}>Editar</Link>
+      <button type="button" className="btn-perigo" onClick={aoExcluir} aria-label={`Excluir ${nome}`}>Excluir</button>
     </div>
   );
 }

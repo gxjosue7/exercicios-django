@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useLogado } from "@/lib/useLogado";
 
-/** Página "novo": exige login, envia `POST` para `caminho` e volta para `rota`. */
 export default function Criacao({
   titulo,
   caminho,

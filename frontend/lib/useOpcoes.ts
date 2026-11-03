@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "./api";
 import type { Paginado } from "./types";
 
-// shortcut: carrega só a primeira página (100 itens, o máximo da API); trocar por busca remota se passar disso
 export function useOpcoes<T extends { id: number }>(endpoint: string | null) {
   const [itens, setItens] = useState<T[]>([]);
 

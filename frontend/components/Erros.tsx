@@ -1,4 +1,3 @@
-/** Mensagens gerais de erro (as de campo aparecem junto de cada campo). */
 export default function Erros({ mensagens }: { mensagens?: string[] }) {
   if (!mensagens?.length) return null;
   return (

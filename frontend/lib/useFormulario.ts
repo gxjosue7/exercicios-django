@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { errosDaApi } from "./api";
 
-/** Envio de formulário com erros da API por campo (`erros.geral` para os demais). */
 export function useFormulario(processar: (dados: FormData) => Promise<void>) {
   const [erros, setErros] = useState<Record<string, string[]>>({});
   const [enviando, setEnviando] = useState(false);

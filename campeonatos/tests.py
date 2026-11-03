@@ -20,7 +20,6 @@ class AuthTests(APITestCase):
         r = self.client.post("/api/auth/token/", {"username": "ana", "password": "senha123"}, format="json")
         self.assertEqual(r.status_code, 200)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {r.json()['access']}")
-        # autenticado, passa da autenticação e cai na validação (400)
         self.assertEqual(self.client.post("/api/campeonatos/", {}, format="json").status_code, 400)
 
     def test_login_invalido(self):
@@ -88,7 +87,6 @@ class RegrasTests(APITestCase):
                 nome=f"Liga {i:02d}", modalidade="Futsal" if i % 2 else "Volei",
                 data_inicio=date(2026, 12, 1), data_fim=date(2026, 12, 2), max_times=4,
             )
-        # 13 campeonatos no total (1 do setUp)
         r = self.client.get("/api/campeonatos/").json()
         self.assertEqual((r["page"], r["page_size"], r["total_pages"], len(r["results"])), (1, 10, 2, 10))
         r = self.client.get("/api/campeonatos/?page=2&page_size=5").json()
@@ -129,11 +127,11 @@ class RegrasTests(APITestCase):
         self.camp.max_times = 3
         self.camp.save()
         c = Time.objects.create(nome="C", sigla="C", campeonato=self.camp)
-        p1 = self.partida().json()["id"]  # A x B
+        p1 = self.partida().json()["id"]
         self.client.post(f"/api/partidas/{p1}/registrar-placar/", {"gols_mandante": 3, "gols_visitante": 1}, format="json")
         p2 = self.partida(mandante=self.b.id, visitante=c.id, data_hora="2026-12-03T15:00:00Z").json()["id"]
         self.client.post(f"/api/partidas/{p2}/registrar-placar/", {"gols_mandante": 1, "gols_visitante": 1}, format="json")
-        self.partida(mandante=c.id, visitante=self.a.id, data_hora="2026-12-04T15:00:00Z")  # agendada: não conta
+        self.partida(mandante=c.id, visitante=self.a.id, data_hora="2026-12-04T15:00:00Z")
         tabela = self.client.get(f"/api/campeonatos/{self.camp.id}/classificacao/").json()
         self.assertEqual([(l["nome"], l["pontos"], l["saldo"], l["jogos"]) for l in tabela],
                          [("A", 3, 2, 1), ("C", 1, 0, 1), ("B", 1, -2, 2)])

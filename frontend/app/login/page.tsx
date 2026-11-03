@@ -20,7 +20,6 @@ export default function LoginPage() {
       router.push("/campeonatos");
     } catch (err) {
       const e2 = errosDaApi(err);
-      // 401 aqui significa usuário ou senha errados
       setErros(e2.geral ? { geral: ["Usuário ou senha inválidos."] } : e2);
       setEnviando(false);
     }

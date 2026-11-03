@@ -35,7 +35,7 @@ class Time(models.Model):
     )
 
     class Meta:
-        constraints = [  # noqa: RUF012
+        constraints = [
             models.UniqueConstraint(
                 fields=["campeonato", "nome"],
                 name="time_unico_no_campeonato"
@@ -45,6 +45,7 @@ class Time(models.Model):
     def __str__(self):
         return f"{self.nome}"
 
+
 class Jogador(models.Model):
     nome = models.CharField(max_length=100)
     numero_camisa = models.PositiveSmallIntegerField()
@@ -52,7 +53,7 @@ class Jogador(models.Model):
     time = models.ForeignKey(Time, on_delete=models.CASCADE, related_name="jogadores")
 
     class Meta:
-        constraints = [  # noqa: RUF012
+        constraints = [
             models.UniqueConstraint(fields=["time", "numero_camisa"], name="camisa_unica_no_time"),
         ]
 

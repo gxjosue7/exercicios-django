@@ -1,56 +1,268 @@
 # API de Campeonatos
 
-Projeto final de Desenvolvimento Web II (BSI, IFC Araquari): uma API REST para
-gerenciar campeonatos, times, jogadores e partidas, feita com Django + Django REST
-Framework.
+Projeto final de Desenvolvimento Web II (BSI, IFC Araquari): uma API REST para gerenciar **campeonatos, times, jogadores e partidas**, com frontend em Next.js.
 
-## Domínio
+- **Backend:** Django 6 + Django REST Framework, SQLite, JWT (`djangorestframework-simplejwt`), Swagger (`drf-spectacular`), `django-filter`.
+- **Frontend:** Next.js 16 (App Router), TypeScript e Tailwind CSS, na pasta [frontend/](frontend/).
+- **Gerenciador de pacotes Python:** [uv](https://docs.astral.sh/uv/).
 
-Gerenciador de campeonatos esportivos.
+## Sumário
 
-| Entidade | Descrição |
-|---|---|
-| `Campeonato` | competição, com modalidade, datas, limite de times e status (`inscricoes`, `andamento`, `encerrado`) |
-| `Time` | pertence a um campeonato; nome único por campeonato |
-| `Jogador` | pertence a um time; camisa única por time |
-| `Partida` | jogo entre dois times (mandante e visitante) do mesmo campeonato |
+1. [Domínio e regras de negócio](#domínio-e-regras-de-negócio)
+2. [Instalação e execução](#instalação-e-execução)
+3. [Credenciais de teste](#credenciais-de-teste)
+4. [Autenticação](#autenticação)
+5. [Endpoints](#endpoints)
+6. [Filtro, busca, ordenação e paginação](#filtro-busca-ordenação-e-paginação)
+7. [Validações e erros](#validações-e-erros)
+8. [Frontend](#frontend)
+9. [Testes](#testes)
+10. [Estrutura do projeto](#estrutura-do-projeto)
+11. [Publicação](#publicação)
+12. [Histórico dos passos](#histórico-dos-passos)
 
-**Regras de negócio:** só entram times com inscrições abertas e vaga; mandante e visitante diferentes e do mesmo campeonato; um time não joga duas partidas no mesmo horário; partida agendada não tem placar e finalizada não aceita novo placar (`POST /api/partidas/{id}/registrar-placar/`).
+## Domínio e regras de negócio
+
+| Entidade | Campos | Observações |
+|---|---|---|
+| `Campeonato` | `nome`, `modalidade`, `data_inicio`, `data_fim`, `max_times`, `status` | `status`: `inscricoes`, `andamento` ou `encerrado` |
+| `Time` | `nome`, `sigla`, `cidade`, `ano_fundacao` (opcional), `descricao` (opcional), `campeonato` | pertence a um campeonato; nome único por campeonato |
+| `Jogador` | `nome`, `numero_camisa`, `posicao` (opcional), `time` | pertence a um time; camisa única por time |
+| `Partida` | `campeonato`, `mandante`, `visitante`, `data_hora`, `status`, `gols_mandante`, `gols_visitante` | `status`: `agendada` ou `finalizada`; gols vazios até finalizar |
+
+Relações: um campeonato tem vários times e partidas; um time tem vários jogadores; uma partida liga dois times do mesmo campeonato. Apagar um campeonato apaga seus times, jogadores e partidas.
+
+**Regras de negócio** (aplicadas no backend):
+
+1. Só é possível cadastrar um time se o campeonato estiver com `status` = `inscricoes` e ainda houver vaga (`max_times`).
+2. Em uma partida, mandante e visitante devem ser times diferentes e pertencer ao campeonato da partida.
+3. Um time não pode ter duas partidas no mesmo horário.
+4. Partida `agendada` não tem placar; partida `finalizada` exige placar completo e **não aceita novo placar**.
+5. O placar é registrado por `POST /api/partidas/{id}/registrar-placar/`, que finaliza a partida. Se ela já estava finalizada, a resposta é `409`.
+6. A classificação do campeonato considera só partidas finalizadas: vitória 3 pontos, empate 1, derrota 0. Desempate: pontos, saldo de gols, gols pró e nome.
 
 ## Instalação e execução
 
-Requisitos: Python 3.14+ e [uv](https://docs.astral.sh/uv/).
+Requisitos: **Python 3.14+**, **[uv](https://docs.astral.sh/uv/)** e **Node.js 18+** (para o frontend).
+
+### Backend
 
 ```bash
 uv sync
 uv run python manage.py migrate
-uv run python manage.py createsuperuser   # usuário do Admin e da API
+uv run python manage.py createsuperuser
 uv run python manage.py runserver
 ```
 
-- API: http://127.0.0.1:8000/api/
-- Swagger: http://127.0.0.1:8000/api/docs/ (Redoc em `/api/redoc/`)
-- Admin: http://127.0.0.1:8000/admin/
-- Testes: `uv run python manage.py test`
-
-Banco: SQLite (`db.sqlite3`, criado pelo `migrate`; não vai para o Git).
-
-Variáveis de ambiente (opcionais em desenvolvimento): `SECRET_KEY`, `DEBUG` (`1` ou `0`) e `ALLOWED_HOSTS` (separados por vírgula). Não há segredos no repositório.
-
-## API
-
-| Recurso | Rotas |
+| O quê | Endereço |
 |---|---|
-| Campeonatos | `/api/campeonatos/`, `/api/campeonatos/{id}/`, `GET /api/campeonatos/{id}/classificacao/` |
-| Times | `/api/times/`, `/api/times/{id}/` |
-| Jogadores | `/api/jogadores/`, `/api/jogadores/{id}/` |
-| Partidas | `/api/partidas/`, `/api/partidas/{id}/`, `POST /api/partidas/{id}/registrar-placar/` |
+| API | http://127.0.0.1:8000/api/ |
+| Swagger | http://127.0.0.1:8000/api/docs/ |
+| Redoc | http://127.0.0.1:8000/api/redoc/ |
+| Schema OpenAPI | http://127.0.0.1:8000/api/schema/ |
+| Django Admin | http://127.0.0.1:8000/admin/ |
 
-Em cada recurso: `GET` lista, `POST`, `GET` item, `PUT`, `PATCH`, `DELETE`. Corpos e respostas de cada operação estão no Swagger. Códigos: `200`, `201`, `204`, `400` (validação), `401` (sem login), `404`, `409` (placar já registrado).
+O banco é SQLite (`db.sqlite3`), criado pelo `migrate` e ignorado pelo Git. Os dados persistem entre reinícios do servidor.
 
-Filtros, busca, ordenação e paginação: ver o **Passo 6** abaixo.
+### Frontend
 
-**Autenticação (JWT):** `GET` é público; as demais operações exigem `Authorization: Bearer <access>`. Obtenha o token em `POST /api/auth/token/` com `{"username", "password"}`. Usuário de teste local: veja o **Passo 7**; em outro ambiente, crie um com `createsuperuser`.
+Com a API no ar:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Abra http://localhost:3000.
+
+### Variáveis de ambiente
+
+Todas são opcionais em desenvolvimento. Não há segredos no repositório.
+
+| Variável | Onde | Padrão | Para quê |
+|---|---|---|---|
+| `SECRET_KEY` | backend | chave de desenvolvimento | chave secreta do Django (obrigatória em produção) |
+| `DEBUG` | backend | `1` | use `0` em produção |
+| `ALLOWED_HOSTS` | backend | vazio | hosts permitidos, separados por vírgula |
+| `CORS_ALLOWED_ORIGINS` | backend | `http://localhost:3000` | origens do frontend, separadas por vírgula |
+| `NEXT_PUBLIC_API_URL` | frontend | `http://localhost:8000/api` | URL base da API |
+
+## Credenciais de teste
+
+Usuários de **desenvolvimento**, que existem apenas no `db.sqlite3` local (não vão para o GitHub):
+
+| Usuário | Senha | Acesso |
+|---|---|---|
+| `admin` | `admin123` | Django Admin, API e frontend |
+| `teste` | `teste123` | API e frontend |
+
+Em outro ambiente, crie um usuário com `uv run python manage.py createsuperuser`.
+
+## Autenticação
+
+JWT. A leitura (`GET`) é pública; criar, alterar e excluir (`POST`, `PUT`, `PATCH`, `DELETE`) exigem login. Sem token válido a resposta é `401`.
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username": "teste", "password": "teste123"}'
+```
+
+Resposta (`200`): `{"refresh": "...", "access": "..."}`. Use o `access` no cabeçalho `Authorization: Bearer <access>`. Para renovar:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/token/refresh/ \
+  -H "Content-Type: application/json" \
+  -d '{"refresh": "<refresh>"}'
+```
+
+No Swagger, use o botão **Authorize** e cole o `access`.
+
+## Endpoints
+
+Base: `/api/`. Todos os recursos têm as mesmas seis operações:
+
+| Método | Rota | Ação | Sucesso |
+|---|---|---|---|
+| `GET` | `/api/{recurso}/` | lista paginada | `200` |
+| `GET` | `/api/{recurso}/{id}/` | um item | `200` |
+| `POST` | `/api/{recurso}/` | cria | `201` |
+| `PUT` | `/api/{recurso}/{id}/` | atualização **completa** | `200` |
+| `PATCH` | `/api/{recurso}/{id}/` | atualização parcial | `200` |
+| `DELETE` | `/api/{recurso}/{id}/` | exclui | `204` |
+
+`{recurso}` é `campeonatos`, `times`, `jogadores` ou `partidas`. Erros comuns: `400` (dado inválido), `401` (sem login), `404` (não encontrado).
+
+### Corpos de exemplo (`POST` e `PUT`)
+
+**Campeonato**
+
+```json
+{"nome": "Copa IFC", "modalidade": "Futsal", "data_inicio": "2026-12-01", "data_fim": "2026-12-20", "max_times": 8, "status": "inscricoes"}
+```
+
+**Time**
+
+```json
+{"nome": "Leoes do IFC", "sigla": "LEO", "cidade": "Araquari", "ano_fundacao": 1999, "descricao": "Time de futsal do IFC", "campeonato": 1}
+```
+
+**Jogador**
+
+```json
+{"nome": "Ze Gol", "numero_camisa": 10, "posicao": "Pivo", "time": 1}
+```
+
+**Partida** (nasce `agendada`, sem placar)
+
+```json
+{"campeonato": 1, "mandante": 1, "visitante": 2, "data_hora": "2026-12-05T15:00:00Z"}
+```
+
+Como o `PUT` é completo, ele exige todos os campos do recurso. Na partida, inclua também `status`, `gols_mandante` e `gols_visitante`.
+
+### Rotas extras
+
+**`POST /api/partidas/{id}/registrar-placar/`** (exige login). Corpo: `{"gols_mandante": 3, "gols_visitante": 1}`. Finaliza a partida e devolve a partida atualizada (`200`). Gols negativos: `400`. Partida já finalizada: `409`.
+
+**`GET /api/campeonatos/{id}/classificacao/`** (público). Lista sem paginação, já ordenada:
+
+```json
+[
+  {"posicao": 1, "time": 1, "nome": "Leoes do IFC", "jogos": 1, "vitorias": 1, "empates": 0, "derrotas": 0, "gols_pro": 3, "gols_contra": 1, "saldo": 2, "pontos": 3}
+]
+```
+
+### Resposta de listas
+
+```json
+{"page": 1, "page_size": 10, "total_pages": 2, "results": []}
+```
+
+## Filtro, busca, ordenação e paginação
+
+Valem para as listas `GET /api/{recurso}/`. Os parâmetros se combinam.
+
+| Recurso | Filtros | Busca (`?search=`) | Ordenação (`?ordering=`) |
+|---|---|---|---|
+| campeonatos | `status`, `modalidade` | nome, modalidade | `nome`, `data_inicio`, `data_fim`, `max_times` |
+| times | `campeonato`, `cidade`, `ano_fundacao` | nome, sigla, cidade, descrição | `nome`, `sigla`, `cidade`, `ano_fundacao` |
+| jogadores | `time`, `time__campeonato`, `posicao` | nome, posição | `nome`, `numero_camisa` |
+| partidas | `campeonato`, `status`, `time` (mandante ou visitante), `data_de`, `data_ate` | nome dos times | `data_hora`, `status` |
+
+- **Ordenação:** use `-` para decrescente, por exemplo `?ordering=-data_hora`.
+- **Busca:** parcial e sem diferenciar maiúsculas de minúsculas.
+- **Datas:** `data_de` e `data_ate` aceitam data e hora (`2026-12-01` ou `2026-12-01T23:59:59`).
+- **Paginação:** `?page=` (a partir de 1) e `?page_size=` (padrão 10, máximo 100). Página além da última devolve `200` com `results` vazio; `page_size` acima de 100 ou `page` menor que 1 devolvem `400`.
+
+Exemplos:
+
+```text
+GET /api/times/?campeonato=1&search=leoes&ordering=nome
+GET /api/partidas/?time=3&status=agendada&ordering=data_hora&page=1&page_size=5
+GET /api/campeonatos/?status=inscricoes&search=copa
+```
+
+## Validações e erros
+
+Respostas de erro são JSON, com a mensagem por campo (as mensagens padrão saem em português):
+
+```json
+{"data_fim": ["A data final não pode ser anterior à inicial."]}
+```
+
+Erros que não são de um campo único vêm em `non_field_errors` ou `detail`.
+
+| Regra | Onde |
+|---|---|
+| Nome com pelo menos 2 caracteres | campeonato, time |
+| `max_times` de pelo menos 2 | campeonato |
+| `data_fim` não anterior a `data_inicio` | campeonato |
+| Cidade de 2 a 50 caracteres; ano de fundação entre 1850 e o ano atual; descrição até 500 caracteres | time |
+| Camisa entre 1 e 99 | jogador |
+| Nome de time único por campeonato; camisa única por time | time, jogador |
+| Regras de negócio 1 a 4 da seção de domínio | time, partida |
+
+## Frontend
+
+Pasta [frontend/](frontend/) (detalhes em [frontend/README.md](frontend/README.md)).
+
+| Rota | O que faz |
+|---|---|
+| `/campeonatos` | lista com busca, filtro por status, ordenação e paginação; criar, editar e excluir |
+| `/campeonatos/{id}/classificacao` | tabela de classificação |
+| `/times`, `/jogadores` | lista com busca, filtros, ordenação e paginação; criar, editar e excluir |
+| `/partidas` | lista com filtros (campeonato, time, status, período); criar, editar, excluir e registrar placar |
+| `/login` | login com JWT (renovação automática do token) |
+
+Leitura é pública; criar, editar, excluir e registrar placar exigem login. Erros da API aparecem junto dos campos. O horário das partidas é exibido em UTC, como a API devolve.
+
+## Testes
+
+```bash
+uv run python manage.py test      # backend: 16 testes (regras, autenticação, consulta, classificação, Swagger)
+cd frontend && npm run lint && npm run build
+```
+
+## Estrutura do projeto
+
+```text
+.
+├── manage.py
+├── pyproject.toml / uv.lock      dependências do backend
+├── config/                       configurações e rotas do Django
+├── campeonatos/                  app: models, serializers, views, filtros, paginação, testes
+│   └── migrations/
+└── frontend/                     app Next.js
+    ├── app/                      rotas (cada pasta é uma URL)
+    ├── components/               formulários, lista, menu
+    └── lib/                      cliente da API e hooks
+```
+
+## Publicação
+
+Ainda não publicada. As URLs da API e do frontend serão registradas aqui quando a publicação for feita.
 
 ---
 
@@ -287,3 +499,12 @@ A URL da API vem de `NEXT_PUBLIC_API_URL` (padrão `http://localhost:8000/api`).
 - **Registrar placar** direto na lista, em partidas agendadas (`POST /api/partidas/{id}/registrar-placar/`); a partida passa a finalizada e o placar não muda mais.
 - **Classificação** (`/campeonatos/{id}/classificacao`): tabela com pontos, jogos, vitórias, empates, derrotas, gols e saldo, acessível pelo botão em cada campeonato.
 - O horário é exibido como a API devolve (UTC), sem conversão de fuso.
+
+---
+
+## Passo 13: frontend, etapa F4 (acabamento e acessibilidade)
+
+- Título de aba por página ("Novo time · Campeonatos"), link "Pular para o conteúdo", `aria-current` no menu e `color-scheme` para tema claro e escuro.
+- Erros de campo ligados ao campo (`aria-describedby` e `aria-invalid`) e botões com o nome do item ("Editar Leoes do IFC").
+- Datas formatadas com `Intl`.
+- README próprio do frontend em `frontend/README.md`.

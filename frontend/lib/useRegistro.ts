@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { apiFetch, mensagemDeErro } from "./api";
 
-/** Carrega um registro (ex.: `/times/3/`) para a tela de edição. */
 export function useRegistro<T>(caminho: string) {
   const [estado, setEstado] = useState<{ registro?: T; erro?: string }>({});
 
