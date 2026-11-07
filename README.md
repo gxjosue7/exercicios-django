@@ -58,3 +58,16 @@ uv run python manage.py loaddata produtos.json
 ```
 
 O banco é o `db.sqlite3` (ignorado pelo Git); quem clonar o projeto roda `migrate` e `loaddata`.
+
+## Aula 19: Django Admin
+
+`ProdutoAdmin` em `produtos/admin.py`: colunas `id`, `nome` e `preco`, e busca pelo nome.
+
+```bash
+uv run python manage.py createsuperuser
+uv run python manage.py runserver
+```
+
+Acesse http://127.0.0.1:8000/admin/ para cadastrar, editar, pesquisar e excluir produtos. O Admin e a futura API usam o mesmo model e o mesmo banco.
+
+Usuário de desenvolvimento deste banco local: `admin` / `admin123`.
