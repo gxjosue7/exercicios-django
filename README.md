@@ -170,3 +170,27 @@ GET /api/produtos/?preco_minimo=100&search=teclado&ordering=nome
 ```
 
 Filtros, busca e ordenação se combinam no mesmo queryset.
+
+## Aula 25: paginação
+
+`ProdutoPagination` (`produtos/pagination.py`) estende o `PageNumberPagination` do DRF e mantém o contrato usado nas aulas de Express e FastAPI. Configuração global em `config/settings.py`: `DEFAULT_PAGINATION_CLASS` e `PAGE_SIZE = 10`.
+
+```json
+{ "page": 1, "page_size": 10, "total_pages": 6, "results": [] }
+```
+
+| Parâmetro | Padrão | Regra |
+|---|---|---|
+| `page` | 1 | inteiro a partir de 1; inválido ou menor que 1 retorna `400` |
+| `page_size` | 10 | máximo 100; acima disso retorna `400` |
+
+Página além da última retorna `200` com `results` vazio. Filtros, busca e ordenação são aplicados antes de paginar.
+
+```text
+GET /api/produtos/?page=1
+GET /api/produtos/?page=2&page_size=20
+GET /api/produtos/?search=mouse&ordering=-preco&page=1&page_size=5
+GET /api/produtos/?page=999
+```
+
+O formato da resposta paginada também aparece documentado no Swagger.

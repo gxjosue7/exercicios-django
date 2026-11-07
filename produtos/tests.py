@@ -34,7 +34,7 @@ class FiltroTests(APITestCase):
     def nomes(self, consulta):
         r = self.client.get(f"/api/produtos/?{consulta}")
         self.assertEqual(r.status_code, 200)
-        return sorted(p["nome"] for p in r.json())
+        return sorted(p["nome"] for p in r.json()["results"])
 
     def test_preco_minimo(self):
         self.assertEqual(self.nomes("preco_minimo=250"), ["Monitor", "Teclado"])
@@ -60,7 +60,7 @@ class OrdenacaoEBuscaTests(APITestCase):
     def nomes(self, consulta):
         r = self.client.get(f"/api/produtos/?{consulta}")
         self.assertEqual(r.status_code, 200)
-        return [p["nome"] for p in r.json()]
+        return [p["nome"] for p in r.json()["results"]]
 
     def test_ordem_padrao_por_id(self):
         self.assertEqual(self.nomes(""), ["Teclado USB", "Mouse USB", "Cabo HDMI", "Monitor"])
@@ -108,3 +108,44 @@ class ValidacaoTests(APITestCase):
         p = Produto.objects.create(nome="Mouse", preco="50.00")
         r = self.client.put(f"/api/produtos/{p.id}/", {"nome": "A", "preco": "10.00"}, format="json")
         self.assertEqual(r.status_code, 400)
+
+
+class PaginacaoTests(APITestCase):
+    def setUp(self):
+        Produto.objects.bulk_create(Produto(nome=f"Produto {i:02d}", preco=f"{i}.00") for i in range(1, 26))
+
+    def get(self, consulta=""):
+        return self.client.get(f"/api/produtos/?{consulta}")
+
+    def test_formato_e_padrao(self):
+        r = self.get().json()
+        self.assertEqual((r["page"], r["page_size"], r["total_pages"], len(r["results"])), (1, 10, 3, 10))
+
+    def test_segunda_pagina_com_page_size(self):
+        r = self.get("page=2&page_size=20").json()
+        self.assertEqual((r["page"], r["page_size"], r["total_pages"], len(r["results"])), (2, 20, 2, 5))
+
+    def test_pagina_alem_do_limite_devolve_lista_vazia(self):
+        r = self.get("page=999")
+        self.assertEqual((r.status_code, r.json()["results"]), (200, []))
+
+    def test_page_size_acima_de_100(self):
+        self.assertEqual(self.get("page_size=101").status_code, 400)
+        self.assertEqual(self.get("page_size=100").status_code, 200)
+
+    def test_page_invalida(self):
+        self.assertEqual(self.get("page=0").status_code, 400)
+        self.assertEqual(self.get("page=abc").status_code, 400)
+
+    def test_combina_com_busca_e_ordenacao(self):
+        r = self.get("search=produto&ordering=-preco&page=1&page_size=5").json()
+        self.assertEqual([p["nome"] for p in r["results"]][:2], ["Produto 25", "Produto 24"])
+        self.assertEqual(r["total_pages"], 5)
+
+    def test_filtro_e_aplicado_antes_da_paginacao(self):
+        r = self.get("preco_minimo=21&page_size=2").json()
+        self.assertEqual((r["total_pages"], len(r["results"])), (3, 2))
+
+    def test_lista_vazia_tem_zero_paginas(self):
+        r = self.get("search=inexistente").json()
+        self.assertEqual((r["total_pages"], r["results"]), (0, []))
