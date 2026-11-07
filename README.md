@@ -71,3 +71,32 @@ uv run python manage.py runserver
 Acesse http://127.0.0.1:8000/admin/ para cadastrar, editar, pesquisar e excluir produtos. O Admin e a futura API usam o mesmo model e o mesmo banco.
 
 Usuário de desenvolvimento deste banco local: `admin` / `admin123`.
+
+## Aula 20: primeiro endpoint com Django REST Framework
+
+```bash
+uv add djangorestframework
+```
+
+`rest_framework` entrou em `INSTALLED_APPS`. Camadas:
+
+```text
+Model → ModelSerializer → ModelViewSet → DefaultRouter → endpoint REST
+```
+
+- `produtos/serializers.py`: `ProdutoSerializer` (`id`, `nome`, `preco`).
+- `produtos/views.py`: `ProdutoViewSet`, com listagem, detalhe, criação, `PUT`, `PATCH` e exclusão.
+- `config/urls.py`: `DefaultRouter` registra `produtos` em `/api/`.
+
+Rotas:
+
+```text
+GET    /api/produtos/
+GET    /api/produtos/{id}/
+POST   /api/produtos/
+PUT    /api/produtos/{id}/
+PATCH  /api/produtos/{id}/
+DELETE /api/produtos/{id}/
+```
+
+Testar no navegador (interface navegável do DRF) em http://127.0.0.1:8000/api/produtos/.
