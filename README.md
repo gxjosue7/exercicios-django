@@ -194,3 +194,52 @@ GET /api/produtos/?page=999
 ```
 
 O formato da resposta paginada também aparece documentado no Swagger.
+
+## Aula 26: exercício, evoluindo o Produto
+
+Três campos novos, um por vez, cada um com sua migration (`0002_produto_marca`, `0003_produto_estoque`, `0004_produto_descricao`):
+
+```bash
+uv run python manage.py makemigrations
+uv run python manage.py migrate
+```
+
+Cada mudança no model atravessa as camadas: model, migration, serializer, validação, filtro, ordenação, busca, Swagger e teste.
+
+| Campo | Model | Validação | Filtro | Ordenação | Busca |
+|---|---|---|---|---|---|
+| `marca` | `CharField(max_length=50, default="Genérica")` | obrigatória, 2 a 50 caracteres (após `strip`) | exato, sem diferenciar maiúsculas: `?marca=dell` | sim | sim |
+| `estoque` | `IntegerField(default=0)` | obrigatório, inteiro, `>= 0` | `?estoque_minimo=` e `?estoque_maximo=` | sim | não (numérico) |
+| `descricao` | `TextField(blank=True, null=True)` | opcional (`null` ou vazio), máximo 500 caracteres | não (resolvido pela busca) | sim | sim |
+
+Exemplos:
+
+```text
+GET /api/produtos/?marca=dell
+GET /api/produtos/?estoque_minimo=10&estoque_maximo=30
+GET /api/produtos/?search=usb-c
+GET /api/produtos/?ordering=-estoque
+```
+
+`POST` e `PUT` agora exigem `nome`, `preco`, `marca` e `estoque`; `descricao` é opcional. Exemplo de corpo:
+
+```json
+{"nome": "Cabo USB", "preco": "20.00", "marca": "Ugreen", "estoque": 10, "descricao": "Cabo USB-C rápido"}
+```
+
+### Dados
+
+O professor disponibiliza um fixture por estágio, e cada um traz só o seu campo (`produtos_com_marca.json`, `produtos_com_estoque.json` e `produtos_com_descrição.json`, baixados do mesmo diretório `produtos/` do repositório do material). Carregá-los em sequência deixa preenchido apenas o último, porque cada `loaddata` substitui o registro inteiro. Por isso eles foram reunidos por `pk` em `produtos_completo.json`, com os 60 produtos e todos os campos:
+
+```bash
+uv run python manage.py migrate
+uv run python manage.py loaddata produtos_completo.json
+```
+
+### Testes
+
+```bash
+uv run python manage.py test
+```
+
+40 testes cobrem CRUD, validações, filtros, ordenação, busca e paginação, inclusive os três campos novos.

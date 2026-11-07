@@ -12,6 +12,6 @@ class ProdutoViewSet(ModelViewSet):
     serializer_class = ProdutoSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_class = ProdutoFilter
-    ordering_fields = ("nome", "preco")
+    ordering_fields = ("nome", "preco", "marca", "estoque", "descricao")
     ordering = ("id",)
-    search_fields = ("nome",)
+    search_fields = ("nome", "marca", "descricao")
