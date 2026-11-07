@@ -38,3 +38,23 @@ Estrutura:
 ├── config/
 └── produtos/
 ```
+
+## Aula 18: model, SQLite e migrations
+
+Model `Produto` em `produtos/models.py` (`nome` e `preco`; o `id` é automático).
+
+```bash
+uv run python manage.py makemigrations
+uv run python manage.py migrate
+uv run python manage.py showmigrations
+uv run python manage.py check
+```
+
+Carga dos dados iniciais (60 produtos), baixados do material do professor:
+
+```bash
+curl -L https://raw.githubusercontent.com/marrcandre/desweb2/main/produtos/produtos.json -o produtos.json
+uv run python manage.py loaddata produtos.json
+```
+
+O banco é o `db.sqlite3` (ignorado pelo Git); quem clonar o projeto roda `migrate` e `loaddata`.
