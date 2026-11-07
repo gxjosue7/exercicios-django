@@ -116,3 +116,18 @@ uv add drf-spectacular
 | Redoc | http://127.0.0.1:8000/api/redoc/ |
 
 O Swagger documenta o CRUD criado na Aula 20; nenhuma ViewSet foi alterada.
+
+## Aula 22: validações
+
+Regras no `ProdutoSerializer` (`produtos/serializers.py`), aplicadas antes de salvar:
+
+- `nome`: após remover espaços das pontas, pelo menos 2 caracteres (o valor limpo é o que fica salvo).
+- `preco`: maior que zero, comparado como `Decimal` (sem converter para `float`).
+
+Dados inválidos retornam `400 Bad Request` com a mensagem por campo, por exemplo `{"nome": ["O nome deve possuir pelo menos 2 caracteres."], "preco": ["O preço deve ser maior que zero."]}`. Dados válidos retornam `201 Created`.
+
+Testes automatizados (começam nesta aula e crescem a cada uma):
+
+```bash
+uv run python manage.py test
+```
