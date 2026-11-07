@@ -100,3 +100,19 @@ DELETE /api/produtos/{id}/
 ```
 
 Testar no navegador (interface navegável do DRF) em http://127.0.0.1:8000/api/produtos/.
+
+## Aula 21: OpenAPI e Swagger
+
+```bash
+uv add drf-spectacular
+```
+
+`drf_spectacular` entrou em `INSTALLED_APPS`; `config/settings.py` ganhou `DEFAULT_SCHEMA_CLASS` em `REST_FRAMEWORK` e `SPECTACULAR_SETTINGS` (título, descrição e versão). As rotas foram acrescentadas em `config/urls.py`.
+
+| O quê | Endereço |
+|---|---|
+| Schema OpenAPI | http://127.0.0.1:8000/api/schema/ |
+| Swagger UI | http://127.0.0.1:8000/api/docs/ |
+| Redoc | http://127.0.0.1:8000/api/redoc/ |
+
+O Swagger documenta o CRUD criado na Aula 20; nenhuma ViewSet foi alterada.
