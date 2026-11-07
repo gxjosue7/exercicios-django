@@ -52,6 +52,38 @@ class FiltroTests(APITestCase):
         self.assertEqual(self.client.get("/api/produtos/?preco_minimo=abc").status_code, 400)
 
 
+class OrdenacaoEBuscaTests(APITestCase):
+    def setUp(self):
+        for nome, preco in (("Teclado USB", "250.00"), ("Mouse USB", "80.00"), ("Cabo HDMI", "20.00"), ("Monitor", "1200.00")):
+            Produto.objects.create(nome=nome, preco=preco)
+
+    def nomes(self, consulta):
+        r = self.client.get(f"/api/produtos/?{consulta}")
+        self.assertEqual(r.status_code, 200)
+        return [p["nome"] for p in r.json()]
+
+    def test_ordem_padrao_por_id(self):
+        self.assertEqual(self.nomes(""), ["Teclado USB", "Mouse USB", "Cabo HDMI", "Monitor"])
+
+    def test_ordenar_por_nome(self):
+        self.assertEqual(self.nomes("ordering=nome"), ["Cabo HDMI", "Monitor", "Mouse USB", "Teclado USB"])
+        self.assertEqual(self.nomes("ordering=-nome")[0], "Teclado USB")
+
+    def test_ordenar_por_preco(self):
+        self.assertEqual(self.nomes("ordering=preco")[0], "Cabo HDMI")
+        self.assertEqual(self.nomes("ordering=-preco")[0], "Monitor")
+
+    def test_busca_parcial_sem_diferenciar_maiusculas(self):
+        self.assertEqual(sorted(self.nomes("search=usb")), ["Mouse USB", "Teclado USB"])
+        self.assertEqual(self.nomes("search=MONI"), ["Monitor"])
+
+    def test_busca_sem_resultados(self):
+        self.assertEqual(self.nomes("search=inexistente"), [])
+
+    def test_combinar_filtro_busca_e_ordenacao(self):
+        self.assertEqual(self.nomes("preco_minimo=100&search=usb&ordering=nome"), ["Teclado USB"])
+
+
 class ValidacaoTests(APITestCase):
     def enviar(self, **dados):
         return self.client.post("/api/produtos/", dados, format="json")

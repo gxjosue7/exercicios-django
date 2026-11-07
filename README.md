@@ -152,3 +152,21 @@ GET /api/produtos/?preco_maximo=1000
 ```
 
 Valor não numérico retorna `400`. Os parâmetros aparecem no Swagger (`/api/docs/`).
+
+## Aula 24: ordenação e busca textual
+
+`ProdutoViewSet` agora usa `DjangoFilterBackend`, `SearchFilter` e `OrderingFilter`, com `ordering_fields = ("nome", "preco")`, `ordering = ("id",)` (ordem padrão) e `search_fields = ("nome",)`.
+
+| Parâmetro | Efeito |
+|---|---|
+| `ordering=nome`, `-nome`, `preco`, `-preco` | ordenação (o `-` inverte) |
+| `search=termo` | busca parcial, sem diferenciar maiúsculas, no nome |
+
+```text
+GET /api/produtos/?ordering=nome
+GET /api/produtos/?ordering=-preco
+GET /api/produtos/?search=mouse
+GET /api/produtos/?preco_minimo=100&search=teclado&ordering=nome
+```
+
+Filtros, busca e ordenação se combinam no mesmo queryset.
