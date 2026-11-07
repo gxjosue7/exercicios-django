@@ -26,6 +26,32 @@ class CrudTests(APITestCase):
         self.assertEqual(self.client.get("/api/docs/").status_code, 200)
 
 
+class FiltroTests(APITestCase):
+    def setUp(self):
+        for nome, preco in (("Cabo", "20.00"), ("Mouse", "80.00"), ("Teclado", "250.00"), ("Monitor", "1200.00")):
+            Produto.objects.create(nome=nome, preco=preco)
+
+    def nomes(self, consulta):
+        r = self.client.get(f"/api/produtos/?{consulta}")
+        self.assertEqual(r.status_code, 200)
+        return sorted(p["nome"] for p in r.json())
+
+    def test_preco_minimo(self):
+        self.assertEqual(self.nomes("preco_minimo=250"), ["Monitor", "Teclado"])
+
+    def test_preco_maximo(self):
+        self.assertEqual(self.nomes("preco_maximo=80"), ["Cabo", "Mouse"])
+
+    def test_intervalo(self):
+        self.assertEqual(self.nomes("preco_minimo=50&preco_maximo=300"), ["Mouse", "Teclado"])
+
+    def test_sem_resultados(self):
+        self.assertEqual(self.nomes("preco_minimo=5000"), [])
+
+    def test_valor_nao_numerico(self):
+        self.assertEqual(self.client.get("/api/produtos/?preco_minimo=abc").status_code, 400)
+
+
 class ValidacaoTests(APITestCase):
     def enviar(self, **dados):
         return self.client.post("/api/produtos/", dados, format="json")

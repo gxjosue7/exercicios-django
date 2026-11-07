@@ -131,3 +131,24 @@ Testes automatizados (começam nesta aula e crescem a cada uma):
 ```bash
 uv run python manage.py test
 ```
+
+## Aula 23: filtros
+
+```bash
+uv add django-filter
+```
+
+`django_filters` entrou em `INSTALLED_APPS` e `DjangoFilterBackend` em `DEFAULT_FILTER_BACKENDS`. Filtros em `produtos/filters.py` (`ProdutoFilter`), ligados à ViewSet por `filterset_class`:
+
+| Parâmetro | Efeito |
+|---|---|
+| `preco_minimo` | `preco >= valor` |
+| `preco_maximo` | `preco <= valor` |
+
+```text
+GET /api/produtos/?preco_minimo=100&preco_maximo=1000
+GET /api/produtos/?preco_minimo=100
+GET /api/produtos/?preco_maximo=1000
+```
+
+Valor não numérico retorna `400`. Os parâmetros aparecem no Swagger (`/api/docs/`).
